@@ -1,6 +1,7 @@
 {
-    "walk": "w:10",
-    "stop": "s:2",
+    "stop": "s",
     "left": "a",
-    "right": "d"
+    "right": "d",
+    "boost": "w+space",
+    "run": "w:5"
 }

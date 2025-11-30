@@ -62,12 +62,13 @@ def ReleaseKey(hexKeyCode):
     x = Input(ctypes.c_ulong(1), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
-def press_key(key_str, duration=0.1):
+def press_key(key_str, duration=0.1, stop_event=None):
     """
     Simulates a key press using DirectInput.
     Args:
         key_str (str): The key to press (e.g., 'w', 'space', 'ctrl+c').
         duration (float): How long to hold the key(s) in seconds.
+        stop_event (threading.Event): Optional event to signal cancellation.
     """
     try:
         key_str = key_str.lower().strip()
@@ -89,8 +90,13 @@ def press_key(key_str, duration=0.1):
         for code in scan_codes_to_press:
             PressKey(code)
         
-        # Hold
-        time.sleep(duration)
+        # Hold with interruption check
+        start_time = time.time()
+        while (time.time() - start_time) < duration:
+            if stop_event and stop_event.is_set():
+                print(f"Command '{key_str}' interrupted.")
+                break
+            time.sleep(0.05) # Check every 50ms
         
         # Release all keys (reverse order)
         for code in reversed(scan_codes_to_press):
